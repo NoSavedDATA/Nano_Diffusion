@@ -1,0 +1,19 @@
+model:
+  num_blocks: 2
+  hidden_groups: [256,512,512,512]
+  strides: [2,2,2,1]
+  down_blocks: ['ResNet', 'ResNet', 'ResNet', 'ResNet']
+  up_blocks: ['ResNet', 'ResNet', 'ResNet', 'ResNet']
+denoise:
+  T_max: 1000
+  timesteps: 50
+
+train:
+  bs: 32
+  lr: 0.0005
+  steps: 70000
+  acc_steps: 8
+  warmup: 0
+  num_workers: -1
+  save_every: 500
+  ckpt: "checkpoints/unet.ckpt"
