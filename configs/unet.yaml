@@ -6,14 +6,14 @@ model:
   up_blocks: ['ResNet', 'ResNet', 'ResNet', 'ResNet']
 denoise:
   T_max: 1000
-  timesteps: 50
+  timesteps: 250
 
 train:
-  bs: 32
+  bs: 2
   lr: 0.0005
-  steps: 70000
-  acc_steps: 8
+  steps: 5000
+  acc_steps: 32
   warmup: 0
   num_workers: -1
-  save_every: 500
+  save_every: 4000
   ckpt: "checkpoints/unet.ckpt"

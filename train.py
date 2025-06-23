@@ -40,12 +40,12 @@ def numpy_to_pil(images):
 
 def denoise(unet, vae, step, config):
     scheduler = unet.noise_scheduler
-    inference_timesteps = config.denoise.timesteps
+    
     
     with torch.no_grad():
         z = torch.randn(16, 4, 32, 32, device='cuda')
         
-        scheduler.set_timesteps(inference_timesteps)
+        scheduler.set_timesteps(config.denoise.timesteps)
         
         # timesteps = torch.arange(inference_timesteps)*(1000//inference_timesteps)
         # timesteps = timesteps.flip(0)[:-1]
@@ -72,8 +72,8 @@ def denoise(unet, vae, step, config):
         image = numpy_to_pil(image.cpu().permute(0, 2, 3, 1).numpy())    
         image_grid = make_image_grid(image, rows=4, cols=4)
      
-        # Save the images   
         image_grid.save(f"out_imgs/{step:04d}.png")
+    scheduler.set_timesteps(config.denoise.T_max)
 
 
 
@@ -109,7 +109,7 @@ def train_step(model, vae, optim, sched, batch, step, config, do_log):
     
     if (step+1)%config.train.acc_steps==0:
         # scaler.unscale_(optim)
-        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=5.0)
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
         # scaler.step(optim)
         # scaler.update()
 
@@ -152,7 +152,7 @@ if __name__=="__main__":
 
     print(f"{config}")
 
-    vae = Vae()    
+    vae = Vae()
 
     loader = Loader(config)
 
@@ -172,6 +172,7 @@ if __name__=="__main__":
         sched.load_state_dict(ckpt['sched'])
         scaler.load_state_dict(ckpt['scaler'])
         step = ckpt['step']
+        print(f"\nRecovering from step {step}.\n")
 
 
     while step<max_step:
@@ -180,11 +181,13 @@ if __name__=="__main__":
             train_step(model, vae, optim, sched, batch, step, config, args.log)
             step+=1
 
-            if step%(config.train.save_every*config.train.acc_steps)==0:
+            if step%config.train.save_every==0:
                 torch.save({"model": model.state_dict(), "optim": optim.state_dict(), "sched": sched.state_dict(),
                             "scaler": scaler.state_dict(), "step": step}, config.train.ckpt)
-                # model.noise_scheduler = DPMSolverMultistepScheduler(num_train_timesteps=1000, beta_start=0.00085, beta_end=0.012, use_karras_sigmas=False, solver_order=2)
+
+            if step%(config.train.save_every*config.train.acc_steps)==0:
+                model.noise_scheduler = DPMSolverMultistepScheduler(num_train_timesteps=1000, beta_start=0.00085, beta_end=0.012, use_karras_sigmas=False, solver_order=2)
                 denoise(model, vae, step, config)
-                # model.noise_scheduler = DDIMScheduler(num_train_timesteps=1000, beta_start=0.00085, beta_end=0.012)
+                model.noise_scheduler = DDIMScheduler(num_train_timesteps=1000, beta_start=0.00085, beta_end=0.012)
 
 

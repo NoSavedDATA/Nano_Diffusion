@@ -1,3 +1,6 @@
 checkpoints/
+data/
+fid_dists/
 *_imgs/
+*_images/
 wandb/
