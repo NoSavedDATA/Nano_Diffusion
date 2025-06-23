@@ -87,5 +87,5 @@ if __name__=="__main__":
     pipe.safety_checker = None
 
 
-    for i in tqdm.tqdm(range(10000)[::16]):
+    for i in tqdm.tqdm(range(2000)[::16]):
         denoise(pipe, i)

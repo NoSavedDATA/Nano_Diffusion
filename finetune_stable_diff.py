@@ -113,8 +113,7 @@ def train(model, optim, loader, vae, noise_scheduler, text_encoder, tokenizer, s
 
 
 
-    # max_step = config.train.steps * config.train.acc_steps
-    max_step = 72000
+    max_step = config.train.steps * config.train.acc_steps
     while step < max_step:
 
         for batch in tqdm.tqdm(loader()):

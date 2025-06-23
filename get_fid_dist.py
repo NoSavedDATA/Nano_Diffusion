@@ -8,8 +8,8 @@ from scipy import linalg
 
 import tqdm
 
-# from loader.games_loader import Loader
-from loader.dit_gen_eval_loader import Loader
+from loader.games_loader import Loader
+# from loader.dit_gen_eval_loader import Loader
 import nosaveddata as nsd
 
 
@@ -50,7 +50,7 @@ if __name__=="__main__":
     config = nsd.read_yaml("configs/unet.yaml")
 
     loader = Loader(config)
-    process_and_save(loader, "fid_dists/sd15_finetune.npz")
+    process_and_save(loader, "fid_dists/games.npz")
 
 
 
